@@ -1,0 +1,62 @@
+# Byte-compiled / optimized / DLL files
+_pycache_/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+tf_env/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Logs and debugging files
+logs/
+*.log
+*.out
+*.err
+
+# Results and generated data
+results/
+results/plots/
+data/cleaned_data/
+
+# Model checkpoints and saved models
+models/
+*.h5
+*.ckpt
+*.tflite
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Temporary and swap files
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+
+# Python packaging files
+*.egg
+*.egg-info/
+dist/
+build/
+site-packages/
+
+# Dependency management files
+pip-log.txt
+poetry.lock
+Pipfile.lock
+
+# IDE/editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# TensorFlow metadata (optional, if applicable)
+tf_env/lib/
+tensorflow_datasets/
