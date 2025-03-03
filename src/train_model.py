@@ -11,7 +11,7 @@ from sklearn.utils import shuffle
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Paths
-CLEANED_DATA_PATH = "data/cleaned_data/cleaned_data.csv"
+PROCESSED_DATA_PATH = "data/processed/processed_data.csv"
 OUTPUT_MODEL_PATH = "models/bert_text_classifier"
 RESULTS_CSV_PATH = "results/training_results.csv"
 
@@ -20,10 +20,10 @@ os.makedirs(OUTPUT_MODEL_PATH, exist_ok=True)
 os.makedirs(os.path.dirname(RESULTS_CSV_PATH), exist_ok=True)
 
 # Global variable for dataset reduction percentage
-REDUCTION_PERCENTAGE = 70  # Set to 1 for 1% reduction
+REDUCTION_PERCENTAGE = 0.1  # Set to 1 for setting the dataset to 1% of its original size
 
-# Load cleaned data
-data = pd.read_csv(CLEANED_DATA_PATH)
+# Load processed data
+data = pd.read_csv(PROCESSED_DATA_PATH)
 
 # Verify dataset structure
 required_columns = ["review", "label"]

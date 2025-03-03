@@ -78,7 +78,7 @@ def evaluate_model(model, tokenizer, test_data_path):
 
 if __name__ == "__main__":
     model_path = 'models/bert_text_classifier'  # Path to the saved model
-    test_data_path = 'data/cleaned_data/cleaned_data.csv'  # Path to the test dataset
+    test_data_path = 'data/processed/processed_data.csv'  # Path to the test dataset
 
     # Load model and tokenizer
     model, tokenizer = load_model(model_path)

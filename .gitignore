@@ -21,7 +21,7 @@ logs/
 # Results and generated data
 results/
 results/plots/
-data/cleaned_data/
+data/processed/
 
 # Model checkpoints and saved models
 models/

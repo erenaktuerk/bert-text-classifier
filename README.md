@@ -67,7 +67,7 @@ Future Improvements:
 BERT Text Classifier
 ├── /data
 │   ├── /raw              # Raw input data
-│   ├── /cleaned_data     # Preprocessed data
+│   ├── /processed     	  # Preprocessed data
 ├── /models               # Saved model checkpoints
 ├── /results
 │   ├── /plots            # Visualization outputs
@@ -127,12 +127,12 @@ This will:
 	•	Generate visualizations and save them in the /results/plots/ folder.
 
 📊 Usage
-	•	Preprocessing: Clean and tokenize raw data:
+	•	Preprocessing: process and tokenize raw data:
 
 python scripts/preprocess_data.py
 
 	•	Input: /data/raw/
-	•	Output: /data/cleaned_data/
+	•	Output: /data/processed/
 
 	•	Model Training: Train the BERT classifier:
 

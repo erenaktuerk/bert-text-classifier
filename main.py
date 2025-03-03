@@ -1,7 +1,7 @@
-from scripts.analysis import perform_analysis, print_analysis_results
-from scripts.visualization import create_sentiment_distribution_plot, create_wordcloud
-from scripts.preprocess_data import load_data, clean_data, preprocess_data, save_cleaned_data
-from scripts.train_model import train_bert_model
+from src.analysis import perform_analysis, print_analysis_results
+from src.visualization import create_sentiment_distribution_plot, create_wordcloud
+from src.preprocess_data import load_data, clean_data, preprocess_data, save_processed_data
+from src.train_model import train_bert_model
 import os
 import sys
 import matplotlib.pyplot as plt
@@ -16,39 +16,39 @@ def on_close(event):
 def main():
     # Define file paths
     input_file = "data/raw/IMDB Dataset.csv"
-    output_file = "data/cleaned_data/cleaned_data.csv"
+    output_file = "data/processed/processed_data.csv"
     output_model_path = "models/bert_text_classifier"
 
     # Debugging: Check if the output directory exists, or create it
-    print(f"Checking if output directory exists for cleaned data: {os.path.dirname(output_file)}")
+    print(f"Checking if output directory exists for processed data: {os.path.dirname(output_file)}")
     if not os.path.exists(os.path.dirname(output_file)):
         print(f"Creating directory: {os.path.dirname(output_file)}")
         os.makedirs(os.path.dirname(output_file))
 
-    # Load and clean data
+    # Load and processed data
     data = load_data(input_file)
-    data_cleaned = clean_data(data)
+    data_processed = clean_data(data)
 
     # Preprocess data for training
-    X_train, X_test, y_train, y_test = preprocess_data(data_cleaned)
+    X_train, X_test, y_train, y_test = preprocess_data(data_processed)
 
-    # Save cleaned data (only 'review' and 'label' columns)
-    save_cleaned_data(data_cleaned, output_file)
+    # Save processed data (only 'review' and 'label' columns)
+    save_processed_data(data_processed, output_file)
 
     # Debugging: Verify if the data was loaded and processed correctly
     print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
 
     # Perform exploratory data analysis (EDA)
-    analysis_results = perform_analysis(data_cleaned)
+    analysis_results = perform_analysis(data_processed)
     print_analysis_results(analysis_results)
 
     # Create visualizations
-    create_sentiment_distribution_plot(data_cleaned)
-    create_wordcloud(data_cleaned)
+    create_sentiment_distribution_plot(data_processed)
+    create_wordcloud(data_processed)
 
     # Remove 'sentiment' column after analysis and visualizations
-    if 'sentiment' in data_cleaned.columns:
-        data_cleaned = data_cleaned.drop(columns=['sentiment'])
+    if 'sentiment' in data_processed.columns:
+        data_processed = data_processed.drop(columns=['sentiment'])
 
     # Set up the on_close event handler for the plots
     plt.gcf().canvas.mpl_connect('close_event', on_close)

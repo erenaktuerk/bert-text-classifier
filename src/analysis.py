@@ -5,7 +5,7 @@ def perform_analysis(df):
     Performs basic statistical analysis on the dataset.
 
     Args:
-        df (pd.DataFrame): Cleaned dataset.
+        df (pd.DataFrame): processed dataset.
 
     Returns:
         dict: Summary statistics of the dataset.
