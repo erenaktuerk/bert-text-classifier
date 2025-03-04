@@ -67,11 +67,11 @@ Future Improvements:
 BERT Text Classifier
 ├── /data
 │   ├── /raw              # Raw input data
-│   ├── /processed     	  # Preprocessed data
+│   ├── /processed        # Preprocessed data
 ├── /models               # Saved model checkpoints
 ├── /results
 │   ├── /plots            # Visualization outputs
-├── /scripts
+├── /src
 │   ├── _init_.py
 │   ├── analysis.py       # Analyzes results
 │   ├── evaluate_model.py # Evaluates trained models
@@ -79,6 +79,8 @@ BERT Text Classifier
 │   ├── preprocess_data.py# Preprocesses raw data
 │   ├── train_model.py    # Trains BERT classifier
 │   ├── visualization.py  # Generates visual reports
+│   ├── augment_data.py   # Handles data augmentation
+│   ├── config.py         # Stores configuration parameters (e.g., augmentation settings)
 ├── /tf_env               # TensorFlow virtual environment
 ├── /venv                 # Python virtual environment
 ├── .gitignore            # Git ignored files
@@ -109,7 +111,6 @@ python3 -m venv venv
 source venv/bin/activate
 
 3️⃣ Install Required Dependencies
-
 After activating the virtual environment, install all necessary libraries:
 
 pip install -r requirements.txt
@@ -127,26 +128,23 @@ This will:
 	•	Generate visualizations and save them in the /results/plots/ folder.
 
 📊 Usage
-	•	Preprocessing: process and tokenize raw data:
+	•	Preprocessing: Process and tokenize raw data:
 
 python scripts/preprocess_data.py
 
 	•	Input: /data/raw/
 	•	Output: /data/processed/
-
 	•	Model Training: Train the BERT classifier:
 
 python scripts/train_model.py
 
-	•	Model is saved in /models/.
-
+	•	The model is saved in /models/.
 	•	Evaluate Model: Evaluate trained model performance:
 
 python scripts/evaluate_model.py
 
-	•	Displays metrics such as accuracy, loss, F1-score.
+	•	Displays metrics such as accuracy, loss, and F1-score.
 	•	Saves results in /results/.
-
 	•	Visualization: Generate performance plots:
 
 python scripts/plot_results.py
@@ -167,7 +165,7 @@ This project is licensed under the MIT License.
 
 For any inquiries or suggestions, feel free to contact me:
 
-📧 your.email@example.com
-🌐 github.com/yourusername
+📧 erenaktuerk@hotmail.com
+🌐 github.com/erenaktuerk
 
 Contributions are welcome! Fork the repository, make changes, and submit a pull request.
