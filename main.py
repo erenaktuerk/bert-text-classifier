@@ -2,16 +2,16 @@ from src.analysis import perform_analysis, print_analysis_results
 from src.visualization import create_sentiment_distribution_plot, create_wordcloud
 from src.preprocess_data import load_data, clean_data, preprocess_data, save_processed_data
 from src.train_model import train_bert_model
+from src.augment_data import augment_texts
 import os
 import sys
 import matplotlib.pyplot as plt
+import config  # Import the central configuration
 
 def on_close(event):
-    """Handler function to close the program when the plot window is closed."""
+    """Exit the program when the visualization window is closed."""
     print("Closing the program as the visualization window was closed.")
-    global visualizations_closed
-    visualizations_closed = True  # Set flag to indicate that visualizations have been closed
-    sys.exit(0)  # Make sure the program exits after the plot window is closed
+    sys.exit(0)
 
 def main():
     # Define file paths
@@ -19,24 +19,25 @@ def main():
     output_file = "data/processed/processed_data.csv"
     output_model_path = "models/bert_text_classifier"
 
-    # Debugging: Check if the output directory exists, or create it
-    print(f"Checking if output directory exists for processed data: {os.path.dirname(output_file)}")
-    if not os.path.exists(os.path.dirname(output_file)):
-        print(f"Creating directory: {os.path.dirname(output_file)}")
-        os.makedirs(os.path.dirname(output_file))
+    # Ensure the output directory for processed data exists
+    output_dir = os.path.dirname(output_file)
+    print(f"Checking if output directory exists for processed data: {output_dir}")
+    if not os.path.exists(output_dir):
+        print(f"Creating directory: {output_dir}")
+        os.makedirs(output_dir)
 
-    # Load and processed data
+    # Load and clean raw data
     data = load_data(input_file)
     data_processed = clean_data(data)
 
-    # Preprocess data for training
+    # Preprocess data (split into train/test)
     X_train, X_test, y_train, y_test = preprocess_data(data_processed)
 
     # Save processed data (only 'review' and 'label' columns)
     save_processed_data(data_processed, output_file)
 
-    # Debugging: Verify if the data was loaded and processed correctly
-    print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
+    # Debug: Print shapes of training data
+    print(f"X_train shape: {X_train.shape}, y_train length: {len(y_train)}")
 
     # Perform exploratory data analysis (EDA)
     analysis_results = perform_analysis(data_processed)
@@ -46,39 +47,60 @@ def main():
     create_sentiment_distribution_plot(data_processed)
     create_wordcloud(data_processed)
 
-    # Remove 'sentiment' column after analysis and visualizations
-    if 'sentiment' in data_processed.columns:
-        data_processed = data_processed.drop(columns=['sentiment'])
+    # Optional: Apply data augmentation to the training data
+    if config.USE_AUGMENTATION:
+        print("Applying data augmentation to the training set...")
+        augmented_X_train = augment_texts(list(X_train), aug_factor=config.AUGMENT_FACTOR)
+        # Duplicate each label for the original + augmented texts
+        augmented_y_train = []
+        for label in y_train:
+            augmented_y_train.extend([label] * (config.AUGMENT_FACTOR + 1))
+        X_train, y_train = augmented_X_train, augmented_y_train
+        print(f"After augmentation: {len(X_train)} training examples.")
 
-    # Set up the on_close event handler for the plots
+    # Set up the on_close event handler for plot windows
     plt.gcf().canvas.mpl_connect('close_event', on_close)
-
-    # Keep the plots open for inspection
     print("Please review the visualizations. Closing now...")
-
-    # Display the plots and wait for them to be closed
+    # This call will block until alle Plots geschlossen werden
     plt.show()
 
-    # Flag to check if visualizations are closed
-    global visualizations_closed
-    visualizations_closed = False
+    # Train the model with hyperparameter tuning using the parameters from config.py
+    best_model = None
+    best_accuracy = 0.0
+    best_hyperparams = {}
+    results = []
 
-    # Train the model with various learning rates and batch sizes
-    learning_rates = [1e-5, 2e-5, 5e-5]
-    batch_sizes = [16, 32, 64]
-    
-    # Loop through learning rates and batch sizes until visualizations are closed
-    for lr in learning_rates:
-        for batch_size in batch_sizes:
-            print(f"Training with learning rate: {lr} and batch size: {batch_size}")
-            train_bert_model(X_train, y_train, X_test, y_test, output_model_path, learning_rate=lr, batch_size=batch_size)
-            
-            # Check if visualizations were closed and exit the loop if they were
-            if visualizations_closed:
-                print("Visualizations closed, stopping further training.")
-                break
-        if visualizations_closed:
-            break
+    for lr in config.LEARNING_RATES:
+        for batch_size in config.BATCH_SIZES:
+            print(f"\nTraining with learning rate: {lr} and batch size: {batch_size}")
+            val_acc, val_loss, model = train_bert_model(
+                X_train, y_train, X_test, y_test,
+                learning_rate=lr,
+                batch_size=batch_size,
+                weight_decay=config.WEIGHT_DECAY,
+                clip_norm=config.CLIP_NORM,
+                epochs=config.EPOCHS
+            )
+            results.append({
+                "learning_rate": lr,
+                "batch_size": batch_size,
+                "val_accuracy": val_acc,
+                "val_loss": val_loss.numpy() if hasattr(val_loss, "numpy") else val_loss
+            })
+            if val_acc > best_accuracy:
+                best_accuracy = val_acc
+                best_model = model
+                best_hyperparams = {"learning_rate": lr, "batch_size": batch_size}
+
+    # Print training summary
+    print("\n### Training Summary ###")
+    for res in results:
+        print(f"LR: {res['learning_rate']}, Batch Size: {res['batch_size']}, Val Accuracy: {res['val_accuracy']:.4f}, Val Loss: {res['val_loss']:.4f}")
+
+    # Save the best model
+    if best_model:
+        best_model.save_pretrained(output_model_path)
+        print(f"\nBest Model saved with LR: {best_hyperparams['learning_rate']} and Batch Size: {best_hyperparams['batch_size']}")
 
     print("Training process completed.")
     print("Program has ended successfully.")
