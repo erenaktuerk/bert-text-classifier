@@ -6,9 +6,10 @@ from transformers import TFBertForSequenceClassification, BertTokenizer
 from sklearn.model_selection import train_test_split
 from tensorflow.keras import optimizers
 from sklearn.utils import shuffle
+from src import config
 
 # Suppress TensorFlow warnings
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = config.TF_CPP_MIN_LOG_LEVEL
 
 # Paths
 PROCESSED_DATA_PATH = "data/processed/processed_data.csv"
@@ -28,7 +29,7 @@ if not all(col in data.columns for col in required_columns):
     raise ValueError(f"The dataset must contain the following columns: {required_columns}")
 
 # Subsampling function
-def reduce_dataset(data, percentage=REDUCTION_PERCENTAGE):
+def reduce_dataset(data, percentage=config.REDUCTION_PERCENTAGE):
     """Reduce the dataset size to a specified percentage."""
     reduced_size = int(len(data) * (percentage / 100))
     data = shuffle(data, random_state=42)  # Shuffle the data
@@ -37,8 +38,8 @@ def reduce_dataset(data, percentage=REDUCTION_PERCENTAGE):
 # Check for TPU availability
 if not tf.config.list_logical_devices('TPU'):  # No TPU available
     print("TPU not available. Reducing dataset size for CPU/GPU usage...")
-    data = reduce_dataset(data, percentage=REDUCTION_PERCENTAGE)
-    print(f"Dataset reduced to {REDUCTION_PERCENTAGE}% of its original size: {len(data)} rows remaining.")
+    data = reduce_dataset(data, percentage=config.REDUCTION_PERCENTAGE)
+    print(f"Dataset reduced to {config.REDUCTION_PERCENTAGE}% of its original size: {len(data)} rows remaining.")
 
 # Split data into training and validation sets
 X_train, X_val, y_train, y_val = train_test_split(
@@ -173,7 +174,7 @@ print(f"\nTraining results saved to {RESULTS_CSV_PATH}")
 if best_model:
     best_model.save_pretrained(OUTPUT_MODEL_PATH)
     print(f"\nBest Model saved with LR: {best_hyperparams['learning_rate']} and Batch Size: {best_hyperparams['batch_size']}")
-    
+ 
     
     
     
@@ -284,3 +285,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
