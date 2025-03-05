@@ -36,7 +36,7 @@ def create_wordcloud(df):
     text = ' '.join(df['review'])  # 'review' remains as in the raw data
 
     # Create a word cloud from the concatenated reviews
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate(text)
+    wordcloud = WordCloud(width=800, height=400, background_color='white', max_words=1000, min_font_size=10).generate(text)
 
     # Set the figure size for the word cloud display
     plt.figure(figsize=(10, 8))

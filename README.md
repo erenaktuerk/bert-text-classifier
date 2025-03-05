@@ -35,6 +35,7 @@ This project employs a comprehensive and systematic approach:
 	4.	Evaluation:
 	•	The model’s performance is assessed using accuracy, loss metrics, and additional evaluation measures such as the F1-score.
 	•	Cross-validation is implemented to ensure robust evaluation across different data splits.
+	•	Evaluation Before Model Training: Evaluation metrics are calculated during the training process. This allows real-time adjustments to hyperparameters, training strategies, or model architecture to ensure continuous optimization and avoid overfitting.
 	5.	Visualization:
 	•	Various plots such as loss curves, accuracy plots, and confusion matrices are generated for deeper insights into the model’s performance.
 	6.	TPU Support:
@@ -85,7 +86,6 @@ BERT Text Classifier
 ├── /venv                 # Python virtual environment
 ├── .gitignore            # Git ignored files
 ├── LICENSE               # Project license
-├── main.py               # Main script for execution
 ├── README.md             # Documentation
 ├── requirements.txt      # Required dependencies
 
@@ -116,7 +116,6 @@ After activating the virtual environment, install all necessary libraries:
 pip install -r requirements.txt
 
 4️⃣ Run the Project
-
 To run the full pipeline, execute:
 
 python main.py
