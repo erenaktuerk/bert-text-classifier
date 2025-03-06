@@ -178,7 +178,7 @@ This project is licensed under the MIT License.
 
 Contact:
 📧 erenaktuerk@hotmail.com
-🌐 GitHub
+🌐 GitHub.com/erenaktuerk
 
 Contributions:
 Fork the repo, make changes, and submit a pull request!
