@@ -19,7 +19,7 @@ PROCESSED_DATA_PATH = "data/processed/processed_data.csv"
 OUTPUT_MODEL_PATH = "models/bert_text_classifier"
 RESULTS_CSV_PATH = "results/training_results.csv"
 
-# Ensure output directories exist
+# Ensuring output directories exist
 os.makedirs(OUTPUT_MODEL_PATH, exist_ok=True)
 os.makedirs(os.path.dirname(RESULTS_CSV_PATH), exist_ok=True)
 
@@ -38,35 +38,35 @@ def reduce_dataset(data, percentage=config.REDUCTION_PERCENTAGE):
     data = shuffle(data, random_state=42)
     return data[:reduced_size]
 
-# Neue Augmentierungsfunktion, die Labels entsprechend dupliziert
+#Augmentation function that duplicates labels accordingly
 def apply_augmentation(X_train, y_train):
     """Apply data augmentation on the training dataset and replicate labels accordingly."""
     if config.USE_AUGMENTATION:
         print("Applying data augmentation...")
         augmented_X_train = []
         augmented_y_train = []
-        # Stelle sicher, dass die Eingaben Listen sind
+        # making sure the inputs are lists
         for text, label in zip(X_train.tolist(), y_train.tolist()):
-            # Originaltext beibehalten
+            # keep OG text
             augmented_X_train.append(text)
             augmented_y_train.append(label)
-            # Augmentierung durchführen – erwarte, dass augment_texts eine Liste von Strings zurückgibt
+            # run augmentation – expecting augment_texts returning a String-list
             aug_texts = augment_texts([text], aug_factor=config.AUGMENT_FACTOR)
-            # Überspringe das erste Element, da es der Originaltext ist
+            # skip the first Element, because it is the OG text
             for aug_text in aug_texts[1:]:
-                # Falls das Ergebnis selbst eine Liste ist, nehme das erste Element
+                # if the result is a list, take the first element
                 if isinstance(aug_text, list):
                     aug_text = aug_text[0]
                 augmented_X_train.append(aug_text)
                 augmented_y_train.append(label)
-        # Debug-Ausgabe: Stichprobe der augmentierten Daten
+        # debug-output: sampling augmented data
         #if len(augmented_X_train) > len(X_train):
          #   print(f"\nSample original text: {X_train.iloc[0]}")
           #  print(f"Sample augmented text: {augmented_X_train[len(X_train)]}")
            # print(f"Original label: {y_train.iloc[0]}")
             #print(f"Augmented label: {augmented_y_train[len(X_train)]}\n")
         #return augmented_X_train, augmented_y_train
-    # Wenn Augmentation deaktiviert ist, gebe Originaldaten als Listen zurück
+    # if augmentation is deactivated, return OG data as list
     return X_train.tolist(), y_train.tolist()
 
 # Check for TPU availability and reduce dataset if necessary
@@ -88,18 +88,18 @@ print(f"Training data size: {len(X_train)}, Training labels size: {len(y_train)}
 if len(X_train) != len(y_train):
     raise ValueError("Mismatch between number of training texts and labels!")
 
-# Initialisiere den Tokenizer einmalig für die Wiederverwendung in der Trainingsfunktion
+# Initialize Tokenizer one time for reusability in training function
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_size=32, weight_decay=None, clip_norm=None):
     """Trains a BERT model with optional Gradient Clipping and Weight Decay."""
     
-    # Initialisiere ein neues Modell
+    # Initialize a new model
     model = TFBertForSequenceClassification.from_pretrained(
         'bert-base-uncased', num_labels=2, from_pt=False
     )
 
-    # Tokenisiere die Textdaten
+    # tokenize the text data
     train_encodings = tokenizer(
         list(X_train), truncation=True, padding=True, max_length=128, return_tensors="tf"
     )
@@ -107,7 +107,7 @@ def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_s
         list(X_val), truncation=True, padding=True, max_length=128, return_tensors="tf"
     )
 
-    # Erstelle TensorFlow-Datasets
+    # create TensorFlow-Datasets
     train_dataset = tf.data.Dataset.from_tensor_slices(
         (dict(train_encodings), tf.convert_to_tensor(y_train, dtype=tf.int32))
     ).shuffle(1000).batch(batch_size)
@@ -115,7 +115,7 @@ def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_s
         (dict(val_encodings), tf.convert_to_tensor(y_val, dtype=tf.int32))
     ).batch(batch_size)
 
-    # Optimizer mit optionalem Weight Decay
+    # Optimizer with optmal Weight Decay
     if weight_decay is not None:
         optimizer = optimizers.AdamW(learning_rate=learning_rate, weight_decay=weight_decay)
     else:
@@ -123,7 +123,7 @@ def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_s
 
     loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
-    # Trainingsschleife
+    # training loop
     epochs = config.EPOCHS
     best_val_accuracy = 0.0
     for epoch in range(epochs):
@@ -146,7 +146,7 @@ def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_s
         print(f"Training loss: {train_loss / len(train_dataset)}")
         print(f"Training accuracy: {train_accuracy.result().numpy()}")
 
-        # Validierung
+        # validation
         val_loss = 0
         val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy()
         for batch in val_dataset:
@@ -163,7 +163,7 @@ def train_bert_model(X_train, y_train, X_val, y_val, learning_rate=5e-5, batch_s
 
     return best_val_accuracy, val_loss / len(val_dataset), model
 
-# Hyperparameter-Suche
+# Hyperparameter search
 learning_rates = [1e-5, 2e-5, 5e-5]
 batch_sizes = [16, 32, 64]
 

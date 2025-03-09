@@ -18,7 +18,7 @@ logs/
 *.out
 *.err
 
-# Results and generated data
+# Results and generated data, they will be generated after model training
 results/
 results/plots/
 data/processed/

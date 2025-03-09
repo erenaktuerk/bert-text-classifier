@@ -84,7 +84,7 @@ def save_processed_data(df, output_path):
     output_dir = os.path.dirname(output_path)
     print(f"Checking if directory {output_dir} exists.")
     if not os.path.exists(output_dir):
-        print(f"Directory {output_dir} does not exist. Creating it now.")
+        print(f"Directory {output_dir} does not exist. Creating it now!!")
         os.makedirs(output_dir, exist_ok=True)
 
     try:

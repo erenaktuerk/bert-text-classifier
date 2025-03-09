@@ -23,7 +23,7 @@ def perform_analysis(df):
 
 def print_analysis_results(analysis_results):
     """
-    Prints the results of the analysis.
+    Print the results of the analysis.
 
     Args:
         analysis_results (dict): Results from the analysis function.

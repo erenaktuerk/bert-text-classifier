@@ -1,0 +1,8 @@
+*.pyc
+_pycache_/
+*.pkl
+*.ipynb
+*.log
+.env
+.DS_Store
+*.git
